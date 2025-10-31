@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.street.model.StreetConstants;
-import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.model.StreetModelDetails;
 
 public class DefaultStreetLimitationParametersServiceTest {
 
@@ -23,7 +23,7 @@ public class DefaultStreetLimitationParametersServiceTest {
     var maxSpeed = 25f;
     int maxAreaNodes = 100;
     repository.setStreetLimitationParameters(
-      new StreetLimitationParameters(maxSpeed, maxAreaNodes)
+      new StreetModelDetails(maxSpeed, maxAreaNodes)
     );
 
     assertEquals(maxSpeed, service.maxCarSpeed());
