@@ -15,8 +15,12 @@ import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultTransitDataProviderFilter implements TransitDataProviderFilter {
+
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultTransitDataProviderFilter.class);
 
   private final boolean requireBikesAllowed;
 
@@ -83,7 +87,16 @@ public class DefaultTransitDataProviderFilter implements TransitDataProviderFilt
   private boolean tripTimesPredicate(TripTimes tripTimes, boolean applyTripTimesFilters) {
     final Trip trip = tripTimes.getTrip();
 
-    if (requireBikesAllowed && bikeAccessForTrip(trip) != BikeAccess.ALLOWED) {
+    // Only filter out trips that explicitly do NOT allow bikes.
+    // Include trips with UNKNOWN (unspecified) or ALLOWED bike access.
+    // This is more permissive than requiring explicit ALLOWED, since most GTFS feeds
+    // don't specify bikes_allowed (defaults to UNKNOWN).
+    if (requireBikesAllowed && bikeAccessForTrip(trip) == BikeAccess.NOT_ALLOWED) {
+      LOG.debug(
+        "Filtering out trip {} on route {} - bikeAccess=NOT_ALLOWED",
+        trip.getId(),
+        trip.getRoute().getName()
+      );
       return false;
     }
 

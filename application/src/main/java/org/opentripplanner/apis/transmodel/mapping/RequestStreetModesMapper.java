@@ -1,17 +1,13 @@
 package org.opentripplanner.apis.transmodel.mapping;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 
 class RequestStreetModesMapper {
 
-  private static final Predicate<StreetMode> IS_BIKE_OR_CAR = m ->
-    m == StreetMode.BIKE || m == StreetMode.CAR;
   private static final String ACCESS_MODE_KEY = "accessMode";
   private static final String EGRESS_MODE_KEY = "egressMode";
   private static final String DIRECT_MODE_KEY = "directMode";
@@ -28,10 +24,12 @@ class RequestStreetModesMapper {
     ensureValueAndSet(accessMode, mBuilder::withAccessMode);
     ensureValueAndSet((StreetMode) modesInput.get(EGRESS_MODE_KEY), mBuilder::withEgressMode);
     ensureValueAndSet((StreetMode) modesInput.get(DIRECT_MODE_KEY), mBuilder::withDirectMode);
-    // The only cases in which the transferMode isn't WALK are when the accessMode is either BIKE or CAR.
-    // In these cases, the transferMode is the same as the accessMode. This check is not strictly necessary
-    // if there is a need for more freedom for specifying the transferMode.
-    Optional.ofNullable(accessMode).filter(IS_BIKE_OR_CAR).ifPresent(mBuilder::withTransferMode);
+    // Note: Transfer mode is NOT auto-set from access mode to avoid unintended filtering.
+    // Auto-setting transfer mode to BIKE triggers the requireBikesAllowed filter, which
+    // filters out all trips without explicit bikes_allowed=ALLOWED in GTFS data.
+    // Most feeds have bikes_allowed=UNKNOWN, causing all trips to be filtered.
+    // Users who want to bike between transit stops (and need bikes on board) should
+    // explicitly set the transfer mode in their request.
 
     return mBuilder.build();
   }
