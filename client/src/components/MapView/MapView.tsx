@@ -5,6 +5,7 @@ import {
   MapGeoJSONFeature,
   MapMouseEvent,
   NavigationControl,
+  GeolocateControl,
   MapRef,
 } from 'react-map-gl/maplibre';
 import maplibregl, { VectorTileSource } from 'maplibre-gl';
@@ -111,6 +112,12 @@ export function MapView({
         ref={mapRef}
       >
         <NavigationControl position="top-left" />
+        <GeolocateControl
+          position="top-left"
+          trackUserLocation={true}
+          showUserHeading={true}
+          showAccuracyCircle={true}
+        />
         <NavigationMarkers
           setCursor={setCursor}
           tripQueryVariables={tripQueryVariables}
