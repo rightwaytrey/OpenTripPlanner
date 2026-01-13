@@ -8,6 +8,7 @@ export default defineConfig({
   server: {
     port: 9966,
     host: '0.0.0.0',
+    allowedHosts: ['tre.hopto.org'],
   },
   build: {
     outDir: 'output',
