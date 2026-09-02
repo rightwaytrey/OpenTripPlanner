@@ -7,6 +7,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_9;
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
@@ -170,6 +171,27 @@ public class ItineraryFiltersConfig {
             """
           )
           .asCostLinearFunction(dft.removeTransitWithHigherCostThanBestOnStreetOnly())
+      )
+      .withRemoveTransitIfWalkingIsBetter(
+        c
+          .of("removeTransitIfWalkingIsBetter")
+          .since(V2_9)
+          .summary(
+            "Remove transit itineraries that cost more than the best walk-all-the-way itinerary."
+          )
+          .description(
+            """
+            This is the `transit-vs-walk-filter`. When it is on (the default), any transit itinerary
+            whose generalized-cost is at least as high as the cheapest walk-all-the-way itinerary is
+            removed, no matter how generous `removeTransitWithHigherCostThanBestOnStreetOnly` is. On
+            short trips that deletes every bus and the API answers with the
+            `WALKING_BETTER_THAN_TRANSIT` routing error and nothing else.
+
+            Set this to `false` to keep those itineraries in the result and let the client tell the
+            traveller that walking is faster instead of deciding for them.
+            """
+          )
+          .asBoolean(dft.removeTransitIfWalkingIsBetter())
       )
       .withBikeRentalDistanceRatio(
         c

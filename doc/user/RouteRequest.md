@@ -122,6 +122,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [nonTransitGeneralizedCostLimit](#rd_if_nonTransitGeneralizedCostLimit)                                   | `cost-linear-function` | The function define a max-limit for generalized-cost for non-transit itineraries.                                                                        | *Optional* | `"1h + 2.0 t"`   |  2.1  |
 |    [parkAndRideDurationRatio](#rd_if_parkAndRideDurationRatio)                                               |        `double`        | Filter P+R routes that consist of driving and walking by the minimum fraction of the driving using of _time_.                                            | *Optional* | `0.0`            |  2.1  |
 |    [removeItinerariesWithSameRoutesAndStops](#rd_if_removeItinerariesWithSameRoutesAndStops)                 |        `boolean`       | Set to true if you want to list only the first itinerary  which goes through the same stops and routes.                                                  | *Optional* | `false`          |  2.2  |
+|    [removeTransitIfWalkingIsBetter](#rd_if_removeTransitIfWalkingIsBetter)                                   |        `boolean`       | Remove transit itineraries that cost more than the best walk-all-the-way itinerary.                                                                      | *Optional* | `true`           |  2.9  |
 |    [removeTransitWithHigherCostThanBestOnStreetOnly](#rd_if_removeTransitWithHigherCostThanBestOnStreetOnly) | `cost-linear-function` | Limit function for generalized-cost computed from street-only itineries applied to transit itineraries.                                                  | *Optional* | `"1m + 1.30 t"`  |  2.4  |
 |    [transitGeneralizedCostLimit](#rd_if_transitGeneralizedCostLimit)                                         |        `object`        | A relative limit for the generalized-cost for transit itineraries.                                                                                       | *Optional* |                  |  2.1  |
 |       [costLimitFunction](#rd_if_transitGeneralizedCostLimit_costLimitFunction)                              | `cost-linear-function` | The base function used by the filter.                                                                                                                    | *Optional* | `"15m + 1.50 t"` |  2.2  |
@@ -847,6 +848,23 @@ result to be included. However, if there is only a single result, it is never fi
 Set to true if you want to list only the first itinerary  which goes through the same stops and routes.
 
 Itineraries visiting the same set of stops and riding the exact same routes, departing later are removed from the result.
+
+<h3 id="rd_if_removeTransitIfWalkingIsBetter">removeTransitIfWalkingIsBetter</h3>
+
+**Since version:** `2.9` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`   
+**Path:** /routingDefaults/itineraryFilters 
+
+Remove transit itineraries that cost more than the best walk-all-the-way itinerary.
+
+This is the `transit-vs-walk-filter`. When it is on (the default), any transit itinerary
+whose generalized-cost is at least as high as the cheapest walk-all-the-way itinerary is
+removed, no matter how generous `removeTransitWithHigherCostThanBestOnStreetOnly` is. On
+short trips that deletes every bus and the API answers with the
+`WALKING_BETTER_THAN_TRANSIT` routing error and nothing else.
+
+Set this to `false` to keep those itineraries in the result and let the client tell the
+traveller that walking is faster instead of deciding for them.
+
 
 <h3 id="rd_if_removeTransitWithHigherCostThanBestOnStreetOnly">removeTransitWithHigherCostThanBestOnStreetOnly</h3>
 

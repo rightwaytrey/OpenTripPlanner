@@ -32,6 +32,7 @@ public final class ItineraryFilterPreferences {
   private final TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
   private final CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
   private final boolean filterDirectFlexBySearchWindow;
+  private final boolean removeTransitIfWalkingIsBetter;
 
   private ItineraryFilterPreferences() {
     this.accessibilityScore = false;
@@ -54,6 +55,7 @@ public final class ItineraryFilterPreferences {
       1.3
     );
     this.filterDirectFlexBySearchWindow = true;
+    this.removeTransitIfWalkingIsBetter = true;
   }
 
   private ItineraryFilterPreferences(Builder builder) {
@@ -78,6 +80,7 @@ public final class ItineraryFilterPreferences {
       builder.removeTransitWithHigherCostThanBestOnStreetOnly
     );
     this.filterDirectFlexBySearchWindow = builder.filterDirectFlexBySearchWindow;
+    this.removeTransitIfWalkingIsBetter = builder.removeTransitIfWalkingIsBetter;
   }
 
   public static Builder of() {
@@ -144,6 +147,16 @@ public final class ItineraryFilterPreferences {
     return filterDirectFlexBySearchWindow;
   }
 
+  /**
+   * When {@code false} the {@code transit-vs-walk-filter}
+   * ({@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfWalkingIsBetter})
+   * is left out of the filter chain, so transit itineraries survive even when a walk-all-the-way
+   * itinerary has a lower generalized-cost.
+   */
+  public boolean removeTransitIfWalkingIsBetter() {
+    return removeTransitIfWalkingIsBetter;
+  }
+
   @Override
   public String toString() {
     return ToStringBuilder.of(ItineraryFilterPreferences.class)
@@ -191,6 +204,11 @@ public final class ItineraryFilterPreferences {
         removeItinerariesWithSameRoutesAndStops
       )
       .addBoolIfTrue("filterDirectFlexBySearchWindow", filterDirectFlexBySearchWindow)
+      .addBool(
+        "removeTransitIfWalkingIsBetter",
+        removeTransitIfWalkingIsBetter,
+        DEFAULT.removeTransitIfWalkingIsBetter
+      )
       .toString();
   }
 
@@ -220,7 +238,8 @@ public final class ItineraryFilterPreferences {
         that.removeTransitWithHigherCostThanBestOnStreetOnly
       ) &&
       Objects.equals(transitGeneralizedCostLimit, that.transitGeneralizedCostLimit) &&
-      filterDirectFlexBySearchWindow == that.filterDirectFlexBySearchWindow
+      filterDirectFlexBySearchWindow == that.filterDirectFlexBySearchWindow &&
+      removeTransitIfWalkingIsBetter == that.removeTransitIfWalkingIsBetter
     );
   }
 
@@ -240,7 +259,8 @@ public final class ItineraryFilterPreferences {
       removeItinerariesWithSameRoutesAndStops,
       transitGeneralizedCostLimit,
       removeTransitWithHigherCostThanBestOnStreetOnly,
-      filterDirectFlexBySearchWindow
+      filterDirectFlexBySearchWindow,
+      removeTransitIfWalkingIsBetter
     );
   }
 
@@ -261,6 +281,7 @@ public final class ItineraryFilterPreferences {
     private TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
     private CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
     private boolean filterDirectFlexBySearchWindow;
+    private boolean removeTransitIfWalkingIsBetter;
 
     public ItineraryFilterPreferences original() {
       return original;
@@ -364,6 +385,7 @@ public final class ItineraryFilterPreferences {
       this.removeTransitWithHigherCostThanBestOnStreetOnly =
         original.removeTransitWithHigherCostThanBestOnStreetOnly;
       this.filterDirectFlexBySearchWindow = original.filterDirectFlexBySearchWindow;
+      this.removeTransitIfWalkingIsBetter = original.removeTransitIfWalkingIsBetter;
     }
 
     public Builder apply(Consumer<Builder> body) {
@@ -374,6 +396,11 @@ public final class ItineraryFilterPreferences {
     public ItineraryFilterPreferences build() {
       var value = new ItineraryFilterPreferences(this);
       return original.equals(value) ? original : value;
+    }
+
+    public Builder withRemoveTransitIfWalkingIsBetter(boolean removeTransitIfWalkingIsBetter) {
+      this.removeTransitIfWalkingIsBetter = removeTransitIfWalkingIsBetter;
+      return this;
     }
 
     public Builder withFilterDirectFlexBySearchWindow(boolean filterDirectFlexBySearchWindow) {
