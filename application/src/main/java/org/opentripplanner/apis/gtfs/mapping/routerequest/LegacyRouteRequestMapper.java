@@ -36,6 +36,10 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class LegacyRouteRequestMapper {
 
+  /** Bounds for the per-request {@code maxStopCount} argument. */
+  static final int MIN_REQUEST_STOP_COUNT = 1;
+  static final int MAX_REQUEST_STOP_COUNT = 20000;
+
   public static RouteRequest toRouteRequest(
     DataFetchingEnvironment environment,
     GraphQLRequestContext context
@@ -157,6 +161,22 @@ public class LegacyRouteRequestMapper {
           )
         );
       });
+      // Per-request stop cap for the access/egress street search. The server
+      // default is sized for its CPU budget (2000 on a 2-vCPU box); a client
+      // that wants the wider search a suburban bike access needs asks for it
+      // here and pays the latency only on that request. Clamped so a stray
+      // value can neither disable access routing nor blow the search up.
+      callWith.argument("maxStopCount", (Integer v) ->
+        preferences.withStreet(st ->
+          st.withAccessEgress(ae ->
+            ae.withMaxStopCount(b ->
+              b.withDefaultLimit(
+                Math.max(MIN_REQUEST_STOP_COUNT, Math.min(MAX_REQUEST_STOP_COUNT, v))
+              )
+            )
+          )
+        )
+      );
       preferences.withTransfer(tx -> {
         callWith.argument("transferPenalty", tx::withCost);
         callWith.argument("minTransferTime", tx::withSlackSec);

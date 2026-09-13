@@ -240,6 +240,46 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
   }
 
   @Test
+  void maxStopCount() {
+    var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(decorateWithRequiredParams(Map.of("maxStopCount", 10000))),
+      context
+    );
+    assertEquals(
+      10000,
+      routeRequest.preferences().street().accessEgress().maxStopCountLimit().defaultLimit()
+    );
+
+    // Out-of-range values are clamped, never rejected and never zero.
+    var tooHigh = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(decorateWithRequiredParams(Map.of("maxStopCount", 1_000_000))),
+      context
+    );
+    assertEquals(
+      LegacyRouteRequestMapper.MAX_REQUEST_STOP_COUNT,
+      tooHigh.preferences().street().accessEgress().maxStopCountLimit().defaultLimit()
+    );
+    var tooLow = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(decorateWithRequiredParams(Map.of("maxStopCount", -5))),
+      context
+    );
+    assertEquals(
+      LegacyRouteRequestMapper.MIN_REQUEST_STOP_COUNT,
+      tooLow.preferences().street().accessEgress().maxStopCountLimit().defaultLimit()
+    );
+
+    // Unset leaves the server default untouched.
+    var noParamsRequest = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(decorateWithRequiredParams(Map.of())),
+      context
+    );
+    assertEquals(
+      context.defaultRouteRequest().preferences().street().accessEgress().maxStopCountLimit(),
+      noParamsRequest.preferences().street().accessEgress().maxStopCountLimit()
+    );
+  }
+
+  @Test
   void walkReluctance() {
     var reluctance = 119d;
     Map<String, Object> arguments = decorateWithRequiredParams(

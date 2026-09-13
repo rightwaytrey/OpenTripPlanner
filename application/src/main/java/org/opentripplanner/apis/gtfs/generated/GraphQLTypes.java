@@ -3086,6 +3086,7 @@ public class GraphQLTypes {
     private Integer keepingRentedBicycleAtDestinationCost;
     private String locale;
     private Integer maxPreTransitTime;
+    private Integer maxStopCount;
     private Integer maxTransfers;
     private Double maxWalkDistance;
     private Integer minTransferTime;
@@ -3165,6 +3166,7 @@ public class GraphQLTypes {
         );
         this.locale = (String) args.get("locale");
         this.maxPreTransitTime = (Integer) args.get("maxPreTransitTime");
+        this.maxStopCount = (Integer) args.get("maxStopCount");
         this.maxTransfers = (Integer) args.get("maxTransfers");
         this.maxWalkDistance = (Double) args.get("maxWalkDistance");
         this.minTransferTime = (Integer) args.get("minTransferTime");
@@ -3347,6 +3349,10 @@ public class GraphQLTypes {
 
     public Integer getGraphQLMaxPreTransitTime() {
       return this.maxPreTransitTime;
+    }
+
+    public Integer getGraphQLMaxStopCount() {
+      return this.maxStopCount;
     }
 
     public Integer getGraphQLMaxTransfers() {
@@ -3609,6 +3615,10 @@ public class GraphQLTypes {
 
     public void setGraphQLMaxPreTransitTime(Integer maxPreTransitTime) {
       this.maxPreTransitTime = maxPreTransitTime;
+    }
+
+    public void setGraphQLMaxStopCount(Integer maxStopCount) {
+      this.maxStopCount = maxStopCount;
     }
 
     public void setGraphQLMaxTransfers(Integer maxTransfers) {

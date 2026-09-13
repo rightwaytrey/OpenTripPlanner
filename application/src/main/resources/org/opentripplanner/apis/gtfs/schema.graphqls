@@ -1549,6 +1549,16 @@ type QueryType {
     drive-to-transit (park and ride or kiss and ride). Default value: 1800.
     """
     maxPreTransitTime: Int @deprecated(reason : "Use walkReluctance or future reluctance parameters for other modes"),
+    """
+    Maximum number of stops the access and egress street searches may collect
+    for each street mode before the transit search starts. Bounds how far from
+    the origin and destination a boarding stop can be found: a bike access of
+    two hours reaches many thousands of stops, and a low cap silently drops the
+    ones farther away. Overrides the server's `routingDefaults.accessEgress.maxStopCount`
+    for this request only; per-mode limits configured on the server still apply.
+    Clamped to 1..20000. Default value: the server configuration (500 in OTP).
+    """
+    maxStopCount: Int,
     "Maximum number of transfers. Default value: 2"
     maxTransfers: Int,
     """
